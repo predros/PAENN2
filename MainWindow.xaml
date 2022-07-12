@@ -1,0 +1,567 @@
+﻿<Window x:Class="PAENN2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PAENN2"
+        mc:Ignorable="d"
+        Title="PAENN 2" Height="700" Width="1000">
+    <Window.Resources>
+        <local:BoolToVisibility x:Key="BoolToVisibility"/>
+        <local:NotBoolToVisibility x:Key="NotBoolToVisibility"/>
+        <local:InverseBool x:Key="InverseBool"/>
+        <local:RadioBoolToInt x:Key="RadioBoolToInt"/>
+    </Window.Resources>
+
+    <Window.InputBindings>
+        <KeyBinding Key="Delete" Command="{Binding Comm_Delete}" />
+        <KeyBinding Key="Z" Modifiers="Ctrl" Command="{Binding Toolbar_Undo}" />
+        <KeyBinding Key="Y" Modifiers="Ctrl" Command="{Binding Toolbar_Redo}" />
+    </Window.InputBindings>
+
+    <Grid>
+        <!--#region Grid definition-->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+        <!--#endregion-->
+
+        <!--#region Canvas and toolbars-->
+        <ScrollViewer x:Name="Scroll" Grid.Row="2" Grid.Column="1" CanContentScroll="False" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
+            <Border x:Name="CanvasBorder" Background="White" Width="10000" Height="10000" MouseWheel="Cnv_MouseWheel" MouseDown="Cnv_MouseDown"
+                    MouseMove="Cnv_MouseMove" MouseUp="Cnv_MouseUp" MouseLeave="Cnv_MouseLeave">
+                <Canvas x:Name="Cnv" Width="0" Height="0" Background="White" RenderTransform="1 0 0 -1 0 0">
+                    <ContentPresenter x:Name="ContentHolder" Content="{x:Static local:VarHolder.Content}"/>
+                </Canvas>
+            </Border>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" Background="#FFF1EDED" Height="40">
+            <Button x:Name="Button_New" Content="Novo" Margin="1" Command="{Binding Toolbar_Newfile}"/>
+            <Button x:Name="Button_Open" Content="Abrir" Margin="1"/>
+            <Button x:Name="Button_Save" Content="Salvar" Margin="1"/>
+            <Button x:Name="Button_SaveAs" Content="Salvar como" Margin="1"/>
+            <Button x:Name="Button_Settings" Content="Config." Margin="1" />
+            <Separator Margin="2"/>
+            <Button x:Name="Button_Undo" ToolTip="Desfazer" Margin="1" Command="{Binding Toolbar_Undo}">
+                <Image Source="Pictures\Toolbar\Icon_Undo.png"/>
+            </Button>
+            <Button x:Name="Button_Redo" ToolTip="Refazer" Margin="1" Command="{Binding Toolbar_Redo}">
+                <Image Source="Pictures\Toolbar\Icon_Redo.png"/>
+            </Button>
+            <Separator Margin="2" />
+            <Button x:Name="Button_Loadcases" Content="Casos de carga" Margin="1" />
+            <Button x:Name="Button_Combinations" Content="Combinações" Margin="1" />
+            <Button x:Name="Button_Run" ToolTip="Rodar análise" Margin="1" Command="{Binding Toolbar_Run}">
+                <Image Source="Pictures\Toolbar\Icon_Run.png"/>
+            </Button>
+        </StackPanel>
+
+
+        <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Vertical" Background="#FFF1EDED">
+            <Button xml:space="preserve" x:Name="Button_Select" Margin="1" Command="{Binding Path=Open_Select}" ToolTip="Selecionar elementos">
+                <Image Source="Pictures\Toolbar\Icon_Select.png"/>
+            </Button>
+            
+            <Button xml:space="preserve" x:Name="Button_NewNode" Margin="1" Command="{Binding Path=Open_NewNode}" ToolTip="Adicionar pontos">
+                <Image Source="Pictures\Toolbar\Icon_NewNode.png"/>
+            </Button>
+
+            <Button xml:space="preserve" x:Name="Button_NewMember" Margin="1" Command="{Binding Path=Open_NewMember}" ToolTip="Adicionar barras">
+                <Image Source="Pictures\Toolbar\Icon_NewMember.png"/>
+            </Button>
+
+            <Button xml:space="preserve" x:Name="Button_Materials" Margin="1" Command="{Binding Path=Open_Materials}" ToolTip="Gerenciar materiais">
+                <Image Source="Pictures\Toolbar\Icon_Materials.png"/>
+            </Button>
+
+            <Button xml:space="preserve" x:Name="Button_Sections" Margin="1" Command="{Binding Path=Open_Sections}" ToolTip="Gerenciar seções">
+                <Image Source="Pictures\Toolbar\Icon_Sections.png"/>
+            </Button>
+            
+            <Button xml:space="preserve" x:Name="Button_Supports" Margin="1" Command="{Binding Path=Open_Supports}" ToolTip="Apoios">
+                <Image Source="Pictures\Toolbar\Icon_Supports.png"/>
+            </Button>
+
+            <Button xml:space="preserve" x:Name="Button_Hinges" Margin="1" Command="{Binding Path=Open_Hinges}" ToolTip="Rótulas">
+                <Image Source="Pictures\Toolbar\Icon_Hinges.png"/>
+            </Button>
+          
+            <Button xml:space="preserve" x:Name="Button_Nodal" Margin="1" Command="{Binding Path=Open_Nodal}" ToolTip="Forças nodais">
+                <Image Source="Pictures\Toolbar\Icon_Nodal.png"/>
+            </Button>
+
+            <Button xml:space="preserve" x:Name="Button_Loads" Margin="1" Command="{Binding Path=Open_Loads}" ToolTip="Cargas distribuídas">
+                <Image Source="Pictures\Toolbar\Icon_Loads.png"/>
+            </Button>
+
+            <Button xml:space="preserve" x:Name="Button_Thermal" Margin="1" Command="{Binding Path=Open_Thermal}" ToolTip="Cargas térmicas">
+                <Image Source="Pictures\Toolbar\Icon_Thermal.png"/>
+            </Button>
+
+        </StackPanel>
+        <!--#endregion-->
+
+        <Grid Grid.Row="2" Grid.Column="0" Background="#FFF1EDED">
+
+            <GroupBox x:Name="Toolbox" Header="{Binding Path=ToolboxTitle}" Margin="0,8,0,7">
+                <Grid>
+                    <!--#region Toolbox: "New Node"-->
+                    <Grid x:Name="Toolbox_NewNode" Visibility="{Binding Vis_NewNode, Converter={StaticResource BoolToVisibility}}" Height="350">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="40"/>
+                            <RowDefinition Height="40"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Image Source="Pictures/Toolbox_NewNode.png" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"  Width="80" Height="80" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                        <Label Content="{Binding Path=Toolbox_NewNode_X}" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5"/>
+                        <Label Content="{Binding Path=Toolbox_NewNode_Y}" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5"/>
+
+                        <TextBox Grid.Row="1" Grid.Column="1" Height="20" Width="50" HorizontalAlignment="Center"
+                                 VerticalAlignment="Bottom" Margin="5" Text="{Binding Path=Textbox_NewNode_X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="False">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding Path=Toolbox_NewNode_Apply}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+
+                        <TextBox Grid.Row="2" Grid.Column="1" Height="20" Width="50" HorizontalAlignment="Center"
+                                 VerticalAlignment="Top" Margin="5" Text="{Binding Path=Textbox_NewNode_Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="False">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding Path=Toolbox_NewNode_Apply}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+
+                        <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" x:Name="Toolbox_NewNode_Add" Content="Adicionar ponto"
+                                Height="25" Margin="20 1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Command="{Binding Path=Toolbox_NewNode_Apply}"/>
+                    </Grid>
+                    <!--#endregion-->
+
+
+                    <!--#region Toolbox: "New Member"-->
+                    <Grid x:Name="Toolbox_NewMember" Visibility="{Binding Vis_NewMember, Converter={StaticResource BoolToVisibility}}" Height="400">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                        </Grid.RowDefinitions>
+
+                        <Image Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" Width="80" Height="80" HorizontalAlignment="Center" VerticalAlignment="Center" Source="Pictures/Toolbox_NewMember.png" />
+
+                        <Label Content="{Binding Path=Toolbox_NewMember_X1}" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="2.5 5"/>
+                        <Label Content="{Binding Path=Toolbox_NewMember_Y1}" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="2.5 5"/>
+
+                        <Label Content="{Binding Path=Toolbox_NewMember_X2}" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="2.5 5"/>
+                        <Label Content="{Binding Path=Toolbox_NewMember_Y2}" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="2.5 5"/>
+
+                        <TextBox Grid.Row="1" Grid.Column="1" Height="20" Width="45" HorizontalAlignment="Center"
+                                 VerticalAlignment="Bottom" Margin="5" AcceptsReturn="False"  Text="{Binding Path=Textbox_NewMember_X1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding Path=Toolbox_NewMember_Apply}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+                        <TextBox Grid.Row="1" Grid.Column="3" Height="20" Width="45" HorizontalAlignment="Center"
+                                 VerticalAlignment="Bottom" Margin="5" AcceptsReturn="False" Text="{Binding Path=Textbox_NewMember_Y1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding Path=Toolbox_NewMember_Apply}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+                        <TextBox Grid.Row="2" Grid.Column="1" Height="20" Width="45" HorizontalAlignment="Center"
+                                 VerticalAlignment="Bottom" Margin="5" AcceptsReturn="False" Text="{Binding Path=Textbox_NewMember_X2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding Path=Toolbox_NewMember_Apply}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+                        <TextBox Grid.Row="2" Grid.Column="3" Height="20" Width="45" HorizontalAlignment="Center"
+                                 VerticalAlignment="Bottom" Margin="5" AcceptsReturn="False" Text="{Binding Path=Textbox_NewMember_Y2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding Path=Toolbox_NewMember_Apply}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+
+                        <Label Content="Material:" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="2.5"/>
+                        <Label Content="Seção:" Grid.Row="4" Grid.Column="0" HorizontalAlignment="Left" Margin="2.5"/>
+
+                        <ComboBox Name="CB_Materials" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" ItemsSource="{Binding MatList}" Text="{Binding CBMaterial, Mode=TwoWay}"
+                                  IsEditable="False" SelectedIndex="0" Height="20" SelectionChanged="CB_NewMember_SelectionChanged"/>
+                        <ComboBox Name="CB_Sections" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" ItemsSource="{Binding SecList}" Text="{Binding CBSection, Mode=TwoWay}"
+                                  IsEditable="False" SelectedIndex="0" Height="20" SelectionChanged="CB_NewMember_SelectionChanged" />
+
+                        <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"  x:Name="Button_NewMember_Apply" Content="Adicionar barra" Height="25" Command="{Binding Toolbox_NewMember_Apply}"/>
+                        <CheckBox Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Barra rígida" IsChecked="False" />
+                    </Grid>
+                    <!--#endregion-->
+
+
+                    <!--#region Toolbox: "Manage Supports"-->
+                    <Grid x:Name="Toolbox_Supports"  Visibility="{Binding Vis_Supports, Converter={StaticResource BoolToVisibility}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <GroupBox Header="Restrições nodais" Grid.Row="0" Margin="5">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+
+                                <Label Content="Direção X:" HorizontalAlignment="Left" Margin="5 2.5" Grid.Row="0" Grid.Column="0"  />
+                                <Label Content="Direção Y:" HorizontalAlignment="Left" Margin="5 2.5" Grid.Row="1" Grid.Column="0"  />
+                                <Label Content="Rotação Z:" HorizontalAlignment="Left" Margin="5 2.5" Grid.Row="2" Grid.Column="0"  />
+                                <Label Content="{Binding Toolbox_Supports_AngleLabel}" HorizontalAlignment="Left" Margin="5 2.5" Grid.Row="3" Grid.Column="0"  />
+
+                                <CheckBox Content="Restrito" IsChecked="{Binding Toolbox_Supports_RestrX}" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" />
+                                <CheckBox Content="Restrito" IsChecked="{Binding Toolbox_Supports_RestrY}" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" />
+                                <CheckBox Content="Restrito" IsChecked="{Binding Toolbox_Supports_RestrZ}" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" />
+                                
+                                <TextBox Grid.Row="3" Grid.Column="1" Height="20" Width="45" HorizontalAlignment="Left"
+                                         VerticalAlignment="Bottom" Margin="5" AcceptsReturn="False" Text="{Binding Path=Textbox_Supports_Angle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Enter" Command="{Binding Path=Toolbox_Supports_Apply}" />
+                                    </TextBox.InputBindings>
+                                </TextBox>
+                            </Grid>
+                        </GroupBox>
+
+                        <GroupBox Header="Constantes de mola" Grid.Row="1" Margin="5">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+
+                                <Label Content="{Binding Toolbox_Supports_SpringLabel}" HorizontalAlignment="Center" Grid.Row="0" Grid.Column="1"  />
+
+                                <Label Content="Direção X:" HorizontalAlignment="Left" Margin="5 2.5" Grid.Row="1" Grid.Column="0"  />
+                                <Label Content="Direção Y:" HorizontalAlignment="Left" Margin="5 2.5" Grid.Row="2" Grid.Column="0"  />
+                                <Label Content="Rotação Z:" HorizontalAlignment="Left" Margin="5 2.5" Grid.Row="3" Grid.Column="0"  />
+
+                                <TextBox Grid.Row="1" Grid.Column="1" Height="20" Width="45" HorizontalAlignment="Center" IsEnabled="{Binding Toolbox_Supports_RestrX, Converter={StaticResource InverseBool}}"
+                                 VerticalAlignment="Bottom" Margin="5" AcceptsReturn="False" Text="{Binding Path=Textbox_Supports_SpringX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Enter" Command="{Binding Path=Toolbox_Supports_Apply}" />
+                                    </TextBox.InputBindings>
+                                </TextBox>
+
+                                <TextBox Grid.Row="2" Grid.Column="1" Height="20" Width="45" HorizontalAlignment="Center" IsEnabled="{Binding Toolbox_Supports_RestrY, Converter={StaticResource InverseBool}}"
+                                 VerticalAlignment="Bottom" Margin="5" AcceptsReturn="False" Text="{Binding Path=Textbox_Supports_SpringY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Enter" Command="{Binding Path=Toolbox_Supports_Apply}" />
+                                    </TextBox.InputBindings>
+                                </TextBox>
+
+                                <TextBox Grid.Row="3" Grid.Column="1" Height="20" Width="45" HorizontalAlignment="Center" IsEnabled="{Binding Toolbox_Supports_RestrZ, Converter={StaticResource InverseBool}}"
+                                 VerticalAlignment="Bottom" Margin="5" AcceptsReturn="False" Text="{Binding Path=Textbox_Supports_SpringZ, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Enter" Command="{Binding Path=Toolbox_Supports_Apply}" />
+                                    </TextBox.InputBindings>
+                                </TextBox>
+                            </Grid>
+                        </GroupBox>
+
+                        <GroupBox Header="Deslocamentos prescritos" Grid.Row="2" Margin="5">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+
+                                <Label Content="{Binding Toolbox_Supports_PdisplLabel}" HorizontalAlignment="Center" Grid.Row="0" Grid.Column="1"  />
+
+                                <Label Content="Direção X:" HorizontalAlignment="Left" Margin="5 2.5" Grid.Row="1" Grid.Column="0"  />
+                                <Label Content="Direção Y:" HorizontalAlignment="Left" Margin="5 2.5" Grid.Row="2" Grid.Column="0"  />
+                                <Label Content="Rotação Z:" HorizontalAlignment="Left" Margin="5 2.5" Grid.Row="3" Grid.Column="0"  />
+
+                                <TextBox Grid.Row="1" Grid.Column="1" Height="20" Width="45" HorizontalAlignment="Center" IsEnabled="{Binding Toolbox_Supports_RestrX}"
+                                 VerticalAlignment="Bottom" Margin="5" AcceptsReturn="False" Text="{Binding Path=Textbox_Supports_PdisplX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Enter" Command="{Binding Path=Toolbox_Supports_Apply}" />
+                                    </TextBox.InputBindings>
+                                </TextBox>
+
+                                <TextBox Grid.Row="2" Grid.Column="1" Height="20" Width="45" HorizontalAlignment="Center" IsEnabled="{Binding Toolbox_Supports_RestrY}"
+                                 VerticalAlignment="Bottom" Margin="5" AcceptsReturn="False" Text="{Binding Path=Textbox_Supports_PdisplY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Enter" Command="{Binding Path=Toolbox_Supports_Apply}" />
+                                    </TextBox.InputBindings>
+                                </TextBox>
+
+                                <TextBox Grid.Row="3" Grid.Column="1" Height="20" Width="45" HorizontalAlignment="Center" IsEnabled="{Binding Toolbox_Supports_RestrZ}"
+                                 VerticalAlignment="Bottom" Margin="5" AcceptsReturn="False" Text="{Binding Path=Textbox_Supports_PdisplZ, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Enter" Command="{Binding Path=Toolbox_Supports_Apply}" />
+                                    </TextBox.InputBindings>
+                                </TextBox>
+                            </Grid>
+                        </GroupBox>
+
+                        <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"  x:Name="Button_Supports_Apply" Content="Aplicar" Height="25" Command="{Binding Toolbox_Supports_Apply}"/>
+
+                    </Grid>
+                    <!--#endregion-->
+
+                    
+                    <!--#region Toolbox: "Add Hinges" -->
+                    <Grid x:Name="Toolbox_Hinges" Visibility="{Binding Vis_Hinges, Converter={StaticResource BoolToVisibility}}" Height="500">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Orientation="Vertical" Grid.Row="0" Margin="0 0 0 10">
+                            <RadioButton x:Name="RB_Hinges_0" Content="Rótula nodal" GroupName="RB_Hinges" IsChecked="{Binding Path=Hinge_Type, Converter={StaticResource RadioBoolToInt}, ConverterParameter=0}" Margin="5"/>
+                            <RadioButton x:Name="RB_Hinges_1" Content="Barra com rótula inicial" GroupName="RB_Hinges" IsChecked="{Binding Path=Hinge_Type, Converter={StaticResource RadioBoolToInt}, ConverterParameter=1}" Margin="5"/>
+                            <RadioButton x:Name="RB_Hinges_2" Content="Barra com rótula final" GroupName="RB_Hinges" IsChecked="{Binding Path=Hinge_Type, Converter={StaticResource RadioBoolToInt}, ConverterParameter=2}" Margin="5"/>
+                            <RadioButton x:Name="RB_Hinges_3" Content="Barra birrotulada" GroupName="RB_Hinges" IsChecked="{Binding Path=Hinge_Type, Converter={StaticResource RadioBoolToInt}, ConverterParameter=3}" Margin="5"/>
+                         </StackPanel>
+
+                        <Button x:Name="Button_Hinges_Apply" Content="Aplicar" Margin="5 1" Grid.Row="1" Height="25" Command="{Binding Toolbox_Hinge_Apply}"/>
+                        <Button x:Name="Button_Hinges_Remove" Content="Remover rótulas" Margin="5 1" Grid.Row="2" Height="25" Command="{Binding Toolbox_Hinge_Remove}"/>
+                    </Grid>
+                    <!--#endregion-->
+                    
+                    
+                    <!--#region Toolbox: "Nodal Forces"-->
+                    <Grid x:Name="Toolbox_Nodal" Visibility="{Binding Vis_Nodal, Converter={StaticResource BoolToVisibility}}" Height="500">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Image Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Height="90" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Center" Source="Pictures/Toolbox_Nodal.png" />
+
+
+                        <Label Content="{Binding Toolbox_Nodal_Fx}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" Grid.Row="1" />
+                        <Label Content="{Binding Toolbox_Nodal_Fy}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" Grid.Row="2" />
+                        <Label Content="{Binding Toolbox_Nodal_Mz}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" Grid.Row="3" />
+                        <Label Content="{Binding Toolbox_Nodal_Angle}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" Grid.Row="4" />
+
+                        <TextBox Grid.Row="1" Grid.Column="1" Height="20" Width="45" HorizontalAlignment="Center" 
+                                 VerticalAlignment="Center" Margin="5" AcceptsReturn="False" Text="{Binding Path=Textbox_Nodal_Fx, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding Toolbox_Nodal_Apply}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+
+                        <TextBox Grid.Row="2" Grid.Column="1" Height="20" Width="45" HorizontalAlignment="Center"
+                                 VerticalAlignment="Center" Margin="5" AcceptsReturn="False" Text="{Binding Path=Textbox_Nodal_Fy, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding Toolbox_Nodal_Apply}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+
+                        <TextBox Grid.Row="3" Grid.Column="1" Height="20" Width="45" HorizontalAlignment="Center"
+                                 VerticalAlignment="Center" Margin="5" AcceptsReturn="False" Text="{Binding Path=Textbox_Nodal_Mz, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding Toolbox_Nodal_Apply}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+
+                        <TextBox Grid.Row="4" Grid.Column="1" Height="20" Width="45" HorizontalAlignment="Center"
+                                 VerticalAlignment="Center" Margin="5" AcceptsReturn="False" Text="{Binding Path=Textbox_Nodal_Angle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding Toolbox_Nodal_Apply}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+
+                        <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"  x:Name="Button_Nodal_Apply" Content="Aplicar" Height="25"
+                                HorizontalAlignment="Stretch" Margin="10 20" Command="{Binding Toolbox_Nodal_Apply}"/>
+                    </Grid>
+                    <!--#endregion-->
+
+
+                    <!--#region Toolbox: "Member Loads"-->
+                    <Grid x:Name="Toolbox_Loads" Visibility="{Binding Vis_Loads, Converter={StaticResource BoolToVisibility}}" Height="500">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Image Source="Pictures\Toolbox_Loads.png" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" HorizontalAlignment="Center" Height="120" Margin="5"
+                               Visibility="{Binding Toolbox_Loads_IsGlobal, Converter={StaticResource BoolToVisibility}}" />
+
+                        <Image Source="Pictures\Toolbox_LoadsLocal.png" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" HorizontalAlignment="Center" Height="120" Margin="5"
+                               Visibility="{Binding Toolbox_Loads_IsGlobal, Converter={StaticResource NotBoolToVisibility}}" />
+
+                        <Label Content="Coord.:" Grid.Row="1" Grid.Column="0" Margin="2.5"/>
+                        <RadioButton Content="Globais" IsChecked="{Binding Toolbox_Loads_IsGlobal}" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" Margin="2.5" />
+                        <RadioButton Content="Locais" IsChecked="{Binding Toolbox_Loads_IsGlobal, Converter={StaticResource InverseBool}}" Grid.Column="2"
+                                     Grid.Row="1" VerticalAlignment="Center" Margin="2.5"/>
+
+                        <Label Grid.Row="2" Grid.Column="1" Margin="2.5" Content="{Binding Toolbox_Loads_Q0}" HorizontalContentAlignment="Center" HorizontalAlignment="Center"/>
+                        <Label Grid.Row="2" Grid.Column="2" Margin="2.5" Content="{Binding Toolbox_Loads_Q1}" HorizontalContentAlignment="Center" HorizontalAlignment="Center"/>
+                        <Label Grid.Row="2" Grid.Column="3" Margin="2.5" Content="Variável"/>
+
+                        <Label Grid.Row="3" Grid.Column="0" Content="Dir. X:"/>
+                        <Label Grid.Row="4" Grid.Column="0" Content="Dir. Y:"/>
+
+                        <TextBox Grid.Row="3" Grid.Column="1" Height="20" Width="45" HorizontalAlignment="Center" 
+                                 VerticalAlignment="Center" Margin="2.5" AcceptsReturn="False" Text="{Binding Textbox_Loads_Qx0, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding Toolbox_Loads_Apply}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+
+                        <TextBox Grid.Row="3" Grid.Column="2" Height="20" Width="45" HorizontalAlignment="Center"  IsEnabled="{Binding Toolbox_Loads_IsXLinear}"
+                                 VerticalAlignment="Center" Margin="2.5" AcceptsReturn="False" Text="{Binding Textbox_Loads_Qx1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding Toolbox_Loads_Apply}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+
+                        <TextBox Grid.Row="4" Grid.Column="1" Height="20" Width="45" HorizontalAlignment="Center"
+                                 VerticalAlignment="Center" Margin="2.5" AcceptsReturn="False" Text="{Binding Textbox_Loads_Qy0, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding Toolbox_Loads_Apply}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+
+                        <TextBox Grid.Row="4" Grid.Column="2" Height="20" Width="45" HorizontalAlignment="Center" IsEnabled="{Binding Toolbox_Loads_IsYLinear}"
+                                 VerticalAlignment="Center" Margin="2.5" AcceptsReturn="False" Text="{Binding Textbox_Loads_Qy1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding Toolbox_Loads_Apply}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+
+                        <CheckBox Grid.Row="3" Grid.Column="3" IsChecked="{Binding Toolbox_Loads_IsXLinear}" HorizontalAlignment="Center"  VerticalAlignment="Center" />
+                        <CheckBox Grid.Row="4" Grid.Column="3" IsChecked="{Binding Toolbox_Loads_IsYLinear}" HorizontalAlignment="Center"  VerticalAlignment="Center" />
+
+                        <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4"  x:Name="Button_Loads_Apply" Content="Aplicar" Height="25"
+                                HorizontalAlignment="Stretch" Margin="10 20" Command="{Binding Toolbox_Loads_Apply}"/>
+                    </Grid>
+                    <!--#endregion-->
+
+                    
+                    <!--#region Toolbox: "Show Results" -->
+                    <Grid x:Name="Toolbox_Results" Visibility="{Binding Vis_Results, Converter={StaticResource BoolToVisibility}}" Height="500">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Label Content="Exibir diagrama:" Grid.Row="0" Grid.Column="0" Margin="2.5"/>
+                        <RadioButton x:Name="RB_Results_Displacement" Content="Deformada da estrutura" GroupName="RB_Results"
+                                     IsChecked="True" Checked="RB_Results_Checked" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Margin="2.5" />
+                        
+                        <RadioButton x:Name="RB_Results_Normal" Content="Esforços normais" GroupName="RB_Results"
+                                     Checked="RB_Results_Checked" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Margin="2.5"/>
+
+                        <RadioButton x:Name="RB_Results_Shear" Content="Esforços cortantes" GroupName="RB_Results"
+                                     Checked="RB_Results_Checked" Grid.Column="0" Grid.Row="3" VerticalAlignment="Center" Margin="2.5"/>
+                        
+                        <RadioButton x:Name="RB_Results_Moment" Content="Momentos fletores" GroupName="RB_Results"
+                                     Checked="RB_Results_Checked" Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Margin="2.5"/>
+
+                        <Label Content="Escala:" Grid.Row="5" Grid.Column="0" Margin="2.5"/>
+                        <Slider Minimum="0" Maximum="20" TickFrequency="2" IsSnapToTickEnabled="True" Value="10" Grid.Row="6" Grid.Column="0"
+                                ValueChanged="Slider_Results_ValueChanged"/>
+
+                    </Grid>
+                    <!--#endregion-->
+                </Grid>
+            </GroupBox>
+        </Grid>
+
+        <!--#region Menu bar definition-->
+        <Menu x:Name="MainMenu" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" Background="#FFF1EDED"></Menu>
+        <!--#endregion-->
+
+
+        <!--#region Status bar definition-->
+        <Grid Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="8*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="0.8*"/>
+            </Grid.ColumnDefinitions>
+            <StatusBar Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Height="20"/>
+            <CheckBox Content="Exibir grade" Grid.Row="0" Grid.Column="1" IsChecked="{Binding Statusbar_GridToggle}" HorizontalAlignment="Left"
+                      VerticalAlignment="Center" Checked="Statusbar_GridCB_Checked" Unchecked="Statusbar_GridCB_Checked"/>
+            <CheckBox Content="Snap" Grid.Row="0" Grid.Column="2" IsChecked="{Binding Statusbar_SnapToggle}" HorizontalAlignment="Left"
+                      VerticalAlignment="Center"/>
+        </Grid>
+
+        <!--#endregion-->
+    </Grid>
+</Window>
