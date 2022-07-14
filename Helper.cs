@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
@@ -42,9 +43,9 @@ namespace PAENN2
 
             return !CanBeNegative && result < 0
                 ? throw new ArgumentOutOfRangeException("Negative values not allowed for this variable.")
-                : !CanBeZero && result.CloseEnough(0, 1e-8)
+                : (!CanBeZero && result.CloseEnough(0, 1e-8)
                 ? throw new ArgumentException("Zero is not a valid value for this variable.")
-                : result;
+                : result);
         }
 
 
@@ -253,6 +254,32 @@ namespace PAENN2
                     cnv.Children.Remove(elem);
                 }
             }
+        }
+
+        public static void MultipleBindings(this object parent, List<FrameworkElement> elements, List<string> sources, DependencyProperty property, UpdateSourceTrigger trigger = UpdateSourceTrigger.PropertyChanged)
+        {
+            int nElements = elements.Count;
+
+            if (sources.Count != nElements)
+                throw new Exception("Element and source lists must have the same number of elements");
+
+            for (int i = 0; i < nElements; i++)
+            {
+                Binding b = new Binding { Source = parent, Path = new PropertyPath(sources[i]), UpdateSourceTrigger = trigger };
+                _ = elements[i].SetBinding(property, b);
+            }
+        }
+
+        public static void SetCanvasPosition(UIElement obj, double top, double left)
+        {
+            Canvas.SetLeft(obj, left);
+            Canvas.SetTop(obj, top);
+        }
+
+        public static void SetCanvasPosition(UIElement obj, double centerX, double centerY, double sizeX, double sizeY)
+        {
+            Canvas.SetLeft(obj, centerX - sizeX / 2);
+            Canvas.SetTop(obj, centerY - sizeY / 2);
         }
     }
 
