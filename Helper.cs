@@ -270,7 +270,7 @@ namespace PAENN2
             }
         }
 
-        public static void SetCanvasPosition(UIElement obj, double top, double left)
+        public static void SetCanvasPosition(UIElement obj, double left, double top)
         {
             Canvas.SetLeft(obj, left);
             Canvas.SetTop(obj, top);

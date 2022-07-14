@@ -173,9 +173,7 @@ namespace PAENN2
                 {
                     Point p = e.GetPosition(Cnv);
 
-                    Canvas.SetLeft(SelectionBox, Math.Min(p.X, AnchorPoint_Canvas.X));
-                    Canvas.SetTop(SelectionBox, Math.Min(p.Y, AnchorPoint_Canvas.Y));
-
+                    Helper.SetCanvasPosition(SelectionBox, Math.Min(p.X, AnchorPoint_Canvas.X), Math.Min(p.Y, AnchorPoint_Canvas.Y));
                     SelectionBox.Width = Math.Abs(p.X - AnchorPoint_Canvas.X);
                     SelectionBox.Height = Math.Abs(p.Y - AnchorPoint_Canvas.Y);
 

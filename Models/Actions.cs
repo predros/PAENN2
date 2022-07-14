@@ -826,12 +826,9 @@ namespace PAENN2.Models
 
             VarHolder.ResultDisplayPath.StrokeThickness = 1 / fx;
 
-            Canvas.SetLeft(VarHolder.ResultDisplayPath, P1.X);
-            Canvas.SetTop(VarHolder.ResultDisplayPath, P1.Y);
 
-            Canvas.SetLeft(VarHolder.ResultDisplayText, p.X);
-            Canvas.SetTop(VarHolder.ResultDisplayText, p.Y);
-
+            Helper.SetCanvasPosition(VarHolder.ResultDisplayPath, P1.X, P1.Y);
+            Helper.SetCanvasPosition(VarHolder.ResultDisplayPath, p.X, p.Y);
 
             TransformGroup t_text = (TransformGroup)VarHolder.ResultDisplayText.RenderTransform;
             TransformGroup t = (TransformGroup)VarHolder.ResultDisplayPath.RenderTransform;
