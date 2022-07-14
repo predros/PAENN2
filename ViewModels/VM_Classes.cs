@@ -81,28 +81,9 @@ namespace PAENN2.ViewModels
                                textblock_Fx, textblock_Fy, textblock_Mz);
 
 
-            Binding binding_Fx = new Binding
-            {
-                Source = this,
-                Path = new PropertyPath("Text_Fx"),
-                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
-            };
-            Binding binding_Fy = new Binding
-            {
-                Source = this,
-                Path = new PropertyPath("Text_Fy"),
-                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
-            };
-            Binding binding_Mz = new Binding
-            {
-                Source = this,
-                Path = new PropertyPath("Text_Mz"),
-                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
-            };
+            this.MultipleBindings(new List<FrameworkElement>{ textblock_Fx, textblock_Fy, textblock_Mz },
+                                  new List<string> { "Text_Fx", "Text_Fy", "Text_Mz" }, TextBlock.TextProperty);
 
-            _ = textblock_Fx.SetBinding(TextBlock.TextProperty, binding_Fx);
-            _ = textblock_Fy.SetBinding(TextBlock.TextProperty, binding_Fy);
-            _ = textblock_Mz.SetBinding(TextBlock.TextProperty, binding_Mz);
         }
 
         public void SetParent(Node node)
@@ -124,8 +105,7 @@ namespace PAENN2.ViewModels
             if (Parent.Restr["Ry"]) restr += 2;
             if (Parent.Restr["Rz"]) restr += 4;
 
-            Canvas.SetTop(img, p.Y - 6);
-            Canvas.SetLeft(img, p.X - 6);
+            Helper.SetCanvasPosition(img, p.X, p.Y, 12, 12);
 
             if (VarHolder.ClickType != "ResultsDispl")
             {
@@ -137,20 +117,14 @@ namespace PAENN2.ViewModels
                 ((RotateTransform)((TransformGroup)textblock_Fx.RenderTransform).Children[1]).CenterX = 20 - hx;
                 ((RotateTransform)((TransformGroup)textblock_Fy.RenderTransform).Children[1]).CenterY = hy + 10;
 
-                Canvas.SetLeft(img_Fy, p.X - 4);
-                Canvas.SetTop(img_Fy, p.Y - hy - 2);
-                Canvas.SetLeft(textblock_Fy, p.X + 10);
-                Canvas.SetTop(textblock_Fy, p.Y - hy - 10);
+                Helper.SetCanvasPosition(img_Fx, p.X + 6, p.X - 4);
+                Helper.SetCanvasPosition(textblock_Fx, p.X + hx - 20, p.Y + 20);
 
-                Canvas.SetLeft(img_Fx, p.X + 6);
-                Canvas.SetTop(img_Fx, p.Y - 4);
-                Canvas.SetLeft(textblock_Fx, p.X + hx - 20);
-                Canvas.SetTop(textblock_Fx, p.Y + 20);
+                Helper.SetCanvasPosition(img_Fy, p.X - 4, p.Y - hy - 2);
+                Helper.SetCanvasPosition(textblock_Fy, p.X + 10, p.Y - hy - 10);
 
-                Canvas.SetLeft(img_Mz, p.X - 20.5);
-                Canvas.SetTop(img_Mz, p.Y - 20.5);
-                Canvas.SetLeft(textblock_Mz, p.X + 15);
-                Canvas.SetTop(textblock_Mz, p.Y - 10);
+                Helper.SetCanvasPosition(img_Mz, p.X - 20.5, p.Y - 20.5);
+                Helper.SetCanvasPosition(textblock_Mz, p.X + 15, p.Y - 10);
             }
             else
             {
@@ -166,32 +140,25 @@ namespace PAENN2.ViewModels
             switch (restr)
             {
                 case 1: // Rx only ("001")
-                    Canvas.SetLeft(img_Rx, p.X - 15);
-                    Canvas.SetTop(img_Rx, p.Y - 30);
+                    Helper.SetCanvasPosition(img_Rx, p.X, p.Y, 30, 60);
                     break;
                 case 2: // Ry only ("010")
-                    Canvas.SetLeft(img_Ry, p.X - 15);
-                    Canvas.SetTop(img_Ry, p.Y - 30);
+                    Helper.SetCanvasPosition(img_Ry, p.X, p.Y, 30, 60);
                     break;
                 case 3: // Rx and Ry ("011")
-                    Canvas.SetLeft(img_Rx, p.X - 15);
-                    Canvas.SetTop(img_Rx, p.Y - 30);
+                    Helper.SetCanvasPosition(img_Rx, p.X, p.Y, 30, 60);
                     break;
                 case 4: // Rz only ("100")
-                    Canvas.SetLeft(img_Rz, p.X - (15 / 2));
-                    Canvas.SetTop(img_Rz, p.Y - (15 / 2));
+                    Helper.SetCanvasPosition(img_Rz, p.X, p.Y, 15, 15);
                     break;
                 case 5: // Rx and Rz ("101")
-                    Canvas.SetLeft(img_Rx, p.X - 15);
-                    Canvas.SetTop(img_Rx, p.Y - 13);
+                    Helper.SetCanvasPosition(img_Rx, p.X, p.Y, 30, 26);
                     break;
                 case 6: // Ry and Rz ("110")
-                    Canvas.SetLeft(img_Ry, p.X - 15);
-                    Canvas.SetTop(img_Ry, p.Y - 13);
+                    Helper.SetCanvasPosition(img_Ry, p.X, p.Y, 30, 26);
                     break;
                 case 7: // Rx, Ry and Rz ("111")
-                    Canvas.SetLeft(img_Rx, p.X - 15);
-                    Canvas.SetTop(img_Rx, p.Y - 8);
+                    Helper.SetCanvasPosition(img_Rx, p.X, p.Y, 30, 16);
                     break;
                 default:
                     break;
@@ -199,22 +166,20 @@ namespace PAENN2.ViewModels
 
             if (!Parent.Springs["Kx"].CloseEnough(0))
             {
-                Canvas.SetLeft(img_Rx, p.X - 15);
-                Canvas.SetTop(img_Rx, p.Y - 30);
+                Helper.SetCanvasPosition(img_Rx, p.X, p.Y, 30, 60);
+
             }
 
 
             if (!Parent.Springs["Ky"].CloseEnough(0))
             {
-                Canvas.SetLeft(img_Ry, p.X - 15);
-                Canvas.SetTop(img_Ry, p.Y - 30);
+                Helper.SetCanvasPosition(img_Rx, p.X, p.Y, 30, 60);
             }
 
 
             if (!Parent.Springs["Kz"].CloseEnough(0))
             {
-                Canvas.SetLeft(img_Rz, p.X - 17);
-                Canvas.SetTop(img_Rz, p.Y - 26);
+                Helper.SetCanvasPosition(img_Rx, p.X, p.Y, 34, 52);
             }
         }
 
@@ -584,25 +549,13 @@ namespace PAENN2.ViewModels
                                           textblock_Qx1, textblock_Qy0, textblock_Qy1,
                                           textblock_R1, textblock_R2);
 
-            Binding binding_Qx0 = new Binding { Source = this, Path = new PropertyPath("Text_Qx0"), UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
-            Binding binding_Qx1 = new Binding { Source = this, Path = new PropertyPath("Text_Qx1"), UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
-            Binding binding_Qy0 = new Binding { Source = this, Path = new PropertyPath("Text_Qy0"), UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
-            Binding binding_Qy1 = new Binding { Source = this, Path = new PropertyPath("Text_Qy1"), UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
-            Binding binding_R1 = new Binding { Source = this, Path = new PropertyPath("Text_R1"), UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
-            Binding binding_R2 = new Binding { Source = this, Path = new PropertyPath("Text_R2"), UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
-            Binding binding_R3 = new Binding { Source = this, Path = new PropertyPath("Text_R3"), UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
-
-            _ = textblock_Qx0.SetBinding(TextBlock.TextProperty, binding_Qx0);
-            _ = textblock_Qx1.SetBinding(TextBlock.TextProperty, binding_Qx1);
-            _ = textblock_Qy0.SetBinding(TextBlock.TextProperty, binding_Qy0);
-            _ = textblock_Qy1.SetBinding(TextBlock.TextProperty, binding_Qy1);
-            _ = textblock_R1.SetBinding(TextBlock.TextProperty, binding_R1);
-            _ = textblock_R2.SetBinding(TextBlock.TextProperty, binding_R2);
-            _ = textblock_R3.SetBinding(TextBlock.TextProperty, binding_R3);
+            this.MultipleBindings(new List<FrameworkElement> { textblock_Qx0, textblock_Qx1, textblock_Qy0, textblock_Qy1, textblock_R1, textblock_R2, textblock_R3 },
+                                  new List<string> { "Text_Qx0", "Text_Qx1", "Text_Qy0", "Text_Qy1", "Text_R1", "Text_R2", "Text_R3" }, TextBlock.TextProperty);
 
 
             WriteableBitmap bmp = BitmapFactory.New(1, 6);
             bmp.FillRectangle(0, 2, 1, 4, Colors.SteelBlue);
+
             Canvas.SetZIndex(img, 8);
             Canvas.SetZIndex(img_hinge0, 10);
             Canvas.SetZIndex(img_hinge1, 10);
@@ -691,14 +644,9 @@ namespace PAENN2.ViewModels
             TransformGroup transf = (TransformGroup)img.RenderTransform;
             transf.AssignToChildren(L, 1, 0, 3, Parent.Angle, L / 2, 3);
 
-            Canvas.SetLeft(img, ((P1.X + P2.X) / 2) - (L / 2));
-            Canvas.SetTop(img, ((P1.Y + P2.Y) / 2) - 3);
-
-            Canvas.SetLeft(img_hinge0, P1.X + 3);
-            Canvas.SetTop(img_hinge0, P1.Y - 5);
-
-            Canvas.SetLeft(img_hinge1, P1.X + L - 13);
-            Canvas.SetTop(img_hinge1, P1.Y - 5);
+            Helper.SetCanvasPosition(img, (P1.X + P2.X) / 2, (P1.Y + P2.Y) / 2, L, 6);
+            Helper.SetCanvasPosition(img_hinge0, P1.X + 3, P1.Y - 5);
+            Helper.SetCanvasPosition(img_hinge1, P1.X + L - 13, P1.Y - 5);
 
             RotateTransform hinge0_transf = (RotateTransform)img_hinge0.RenderTransform;
             RotateTransform hinge1_transf = (RotateTransform)img_hinge1.RenderTransform;
@@ -707,7 +655,6 @@ namespace PAENN2.ViewModels
             hinge0_transf.CenterY = hinge1_transf.CenterY = 5;
             hinge0_transf.CenterX = -3;
             hinge1_transf.CenterX = -L + 13;
-
             #endregion
 
 
@@ -752,8 +699,7 @@ namespace PAENN2.ViewModels
                         break;
                 }
 
-                Canvas.SetLeft(resultpath, P1.X);
-                Canvas.SetTop(resultpath, P1.Y);
+                Helper.SetCanvasPosition(resultpath, P1.X, P1.Y);
 
                 transform.AssignToChildren(f, f, -lres["ux0"], 0, Parent.Angle, 0, 0);
 
@@ -773,8 +719,8 @@ namespace PAENN2.ViewModels
                         TransformGroup t = (TransformGroup)textblock_R1.RenderTransform;
                         t.AssignToChildren(k_angle, -k_angle, size_r1.Width / 2, 0, Parent.Angle, -p.X + P1.X, -p.Y + P1.Y);
 
-                        Canvas.SetLeft(textblock_R1, p.X);
-                        Canvas.SetTop(textblock_R1, p.Y);
+                        Helper.SetCanvasPosition(textblock_R1, p.X, p.Y);
+
                     }
                     else
                     {
@@ -787,11 +733,8 @@ namespace PAENN2.ViewModels
                         t1.AssignToChildren(k_angle, -k_angle, size_r1.Width / 2, 0, Parent.Angle, -pa.X + P1.X, -pa.Y + P1.Y);
                         t2.AssignToChildren(k_angle, -k_angle, size_r2.Width / 2, 0, Parent.Angle, -pb.X + P1.X, -pb.Y + P1.Y);
 
-                        Canvas.SetLeft(textblock_R1, pa.X);
-                        Canvas.SetTop(textblock_R1, pa.Y);
-
-                        Canvas.SetLeft(textblock_R2, pb.X);
-                        Canvas.SetTop(textblock_R2, pb.Y);
+                        Helper.SetCanvasPosition(textblock_R1, pa.X, pa.Y);
+                        Helper.SetCanvasPosition(textblock_R2, pb.X, pb.Y);
                     }
                 }
 
@@ -806,11 +749,8 @@ namespace PAENN2.ViewModels
                     t1.AssignToChildren(k_angle, -k_angle, size_r1.Width / 2, 0, Parent.Angle, -pa.X + P1.X, -pa.Y + P1.Y);
                     t2.AssignToChildren(k_angle, -k_angle, size_r2.Width / 2, 0, Parent.Angle, -pb.X + P1.X, -pb.Y + P1.Y);
 
-                    Canvas.SetLeft(textblock_R1, pa.X);
-                    Canvas.SetTop(textblock_R1, pa.Y);
-
-                    Canvas.SetLeft(textblock_R2, pb.X);
-                    Canvas.SetTop(textblock_R2, pb.Y);
+                    Helper.SetCanvasPosition(textblock_R1, pa.X, pa.Y);
+                    Helper.SetCanvasPosition(textblock_R2, pb.X, pb.Y);
                 }
                 return;
             }
@@ -840,8 +780,7 @@ namespace PAENN2.ViewModels
                     {
                         Point p = new Point(P1.X + (L / 2) - (size_x0.Width / 2), P1.Y - (5 + x0));
 
-                        Canvas.SetLeft(textblock_Qx0, p.X);
-                        Canvas.SetTop(textblock_Qx0, p.Y);
+                        Helper.SetCanvasPosition(textblock_Qx0, p.X, p.Y);
 
                         TransformGroup t = (TransformGroup)textblock_Qx0.RenderTransform;
                         t.AssignToChildren(k_angle, -k_angle, size_x0.Width / 2, 0, Parent.Angle, -p.X + P1.X, -p.Y + P1.Y); ;
@@ -852,11 +791,8 @@ namespace PAENN2.ViewModels
                         Point pa = new Point(P1.X, P1.Y - (5 + x0));
                         Point pb = new Point(P1.X + L - size_x0.Width, P1.Y - (5 + x1));
 
-                        Canvas.SetLeft(textblock_Qx0, pa.X);
-                        Canvas.SetTop(textblock_Qx0, pa.Y);
-
-                        Canvas.SetLeft(textblock_Qx1, pb.X);
-                        Canvas.SetTop(textblock_Qx1, pb.Y);
+                        Helper.SetCanvasPosition(textblock_Qx0, pa.X, pa.Y);
+                        Helper.SetCanvasPosition(textblock_Qx1, pb.X, pb.Y);
 
                         TransformGroup t1 = (TransformGroup)textblock_Qx0.RenderTransform;
                         TransformGroup t2 = (TransformGroup)textblock_Qx1.RenderTransform;
@@ -880,8 +816,7 @@ namespace PAENN2.ViewModels
                         TransformGroup t = (TransformGroup)textblock_Qy0.RenderTransform;
                         t.AssignToChildren(k_angle, -k_angle, size_y0.Width / 2, 0, Parent.Angle, -p.X + P1.X, -p.Y + P1.Y);
 
-                        Canvas.SetLeft(textblock_Qy0, p.X);
-                        Canvas.SetTop(textblock_Qy0, p.Y);
+                        Helper.SetCanvasPosition(textblock_Qy0, p.X, p.Y);
                     }
 
                     else
@@ -895,12 +830,8 @@ namespace PAENN2.ViewModels
                         t1.AssignToChildren(k_angle, -k_angle, size_y0.Width / 2, 0, Parent.Angle, -pa.X + P1.X, -pa.Y + P1.Y);
                         t2.AssignToChildren(k_angle, -k_angle, size_y1.Width / 2, 0, Parent.Angle, -pb.X + P1.X, -pb.Y + P1.Y);
 
-                        Canvas.SetLeft(textblock_Qy0, pa.X);
-                        Canvas.SetTop(textblock_Qy0, pa.Y);
-
-                        Canvas.SetLeft(textblock_Qy1, pb.X);
-                        Canvas.SetTop(textblock_Qy1, pb.Y);
-
+                        Helper.SetCanvasPosition(textblock_Qy0, pa.X, pa.Y);
+                        Helper.SetCanvasPosition(textblock_Qy0, pb.X, pb.Y);
                     }
 
                 }
@@ -915,8 +846,7 @@ namespace PAENN2.ViewModels
 
                     if (qx0.CloseEnough(qx1))
                     {
-                        Canvas.SetLeft(textblock_Qx0, Math.Min(P1.X, P2.X) - lxp["H"] - size_x0.Height - 4);
-                        Canvas.SetTop(textblock_Qx0, ((P1.Y + P2.Y) / 2) - (size_x0.Width / 2));
+                        Helper.SetCanvasPosition(textblock_Qx0, Math.Min(P1.X, P2.X), (P1.Y + P2.Y) / 2, 2 * (lxp["H"] + size_x0.Height + 4), size_x0.Width);
 
                         if (qx0 * qx1 > 0 && qx0 < 0)
                         {
@@ -963,8 +893,7 @@ namespace PAENN2.ViewModels
                 {
                     if (qy0.CloseEnough(qy1))
                     {
-                        Canvas.SetLeft(textblock_Qy0, ((P1.X + P2.X) / 2) - (size_y0.Width / 2));
-                        Canvas.SetTop(textblock_Qy0, Math.Min(P1.Y, P2.Y) - lyp["H"] - 5);
+                        Helper.SetCanvasPosition(textblock_Qy0, (P1.X + P2.X) / 2, Math.Min(P1.Y, P2.Y), size_y0.Width, 2 * lyp["H"] + 10);
 
                         if (qy0 * qy1 > 0 && qy0 < 0)
                         {
@@ -1183,8 +1112,8 @@ namespace PAENN2.ViewModels
 
             // Positioning the Image in the Canvas
             Canvas.SetZIndex(image, 9);
-            Canvas.SetLeft(image, ((P1.X + P2.X) / 2) - (bmp.Width / 2));
-            Canvas.SetTop(image, ((P1.Y + P2.Y) / 2) - (bmp.Height / 2));
+            Helper.SetCanvasPosition(image, (P1.X + P2.X) / 2, (P1.Y + P2.Y) / 2, bmp.Width, bmp.Height);
+
         }
 
 
@@ -1244,8 +1173,7 @@ namespace PAENN2.ViewModels
             image.RenderTransform = new TransformGroup { Children = { scaleload, rotate } };
 
             // Positioning the Image control
-            Canvas.SetLeft(image, ((P1.X + P2.X) / 2) - (bmp.Width / 2));
-            Canvas.SetTop(image, ((P1.Y + P2.Y) / 2) - lyp["axis"]);
+            Helper.SetCanvasPosition(image, (P1.X + P2.X) / 2, (P1.Y + P2.Y) / 2, bmp.Width, 2 * lyp["axis"]);
         }
 
 
@@ -1298,12 +1226,15 @@ namespace PAENN2.ViewModels
             bmp.Freeze();
 
             // Positioning the Image control
-            Canvas.SetLeft(image, Math.Min(P1.X, P2.X) - lxp["H"] - 5);
             Canvas.SetTop(image, Math.Min(P1.Y, P2.Y));
 
             if (q0 * q1 > 0 && q0 < 0)
             {
                 Canvas.SetLeft(image, Math.Max(P1.X, P2.X) + 5);
+            }
+            else
+            {
+                Canvas.SetLeft(image, Math.Min(P1.X, P2.X) - lxp["H"] - 5);
             }
         }
 
@@ -1358,11 +1289,14 @@ namespace PAENN2.ViewModels
 
             // Positioning the Image control
             Canvas.SetLeft(image, Math.Min(P1.X, P2.X));
-            Canvas.SetTop(image, Math.Max(P1.Y, P2.Y) + 5);
 
             if (q0 * q1 > 0 && q0 > 0)
             {
                 Canvas.SetTop(image, Math.Min(P1.Y, P2.Y) - 5 - lyp["H"]);
+            }
+            else
+            {
+                Canvas.SetTop(image, Math.Max(P1.Y, P2.Y) + 5);
             }
         }
         #endregion
