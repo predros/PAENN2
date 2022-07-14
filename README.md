@@ -20,6 +20,6 @@ Coming soon, once I iron out some kinks.
 
 ## Acknowledgements
 
-PAENN was written in .NET C#, and uses Microsoft's [Windows Presentation Foundation]{https://github.com/dotnet/wpf} framework for its user interface, and [Math.NET Numerics]{https://github.com/mathnet/mathnet-numerics} for its core calculations.
+PAENN was written in .NET C#, and uses Microsoft's [Windows Presentation Foundation](https://github.com/dotnet/wpf) framework for its user interface, Rene Schulte's [WriteableBitmapEx](https://github.com/reneschulte/WriteableBitmapEx) for drawing and manipulating interactive elements, and [Math.NET Numerics](https://github.com/mathnet/mathnet-numerics) for its core calculations.
 
 
