@@ -53,8 +53,6 @@ namespace PAENN2.Models
 
             Redo_Nodes.RemoveRange(1, Redo_Nodes.Count - 1);
             Redo_Members.RemoveRange(1, Redo_Members.Count - 1);
-
-            Trace.WriteLine($"Undo = {Undo_Nodes.Count}, Redo = {Redo_Nodes.Count}");
         }
 
 
@@ -98,8 +96,6 @@ namespace PAENN2.Models
 
             Undo_Nodes.RemoveAt(n);
             Undo_Members.RemoveAt(n);
-
-            Trace.WriteLine($"Undo = {Undo_Nodes.Count}, Redo = {Redo_Nodes.Count}");
         }
 
 
@@ -143,8 +139,6 @@ namespace PAENN2.Models
 
             Redo_Nodes.RemoveAt(n);
             Redo_Members.RemoveAt(n);
-
-            Trace.WriteLine($"Undo = {Undo_Nodes.Count}, Redo = {Redo_Nodes.Count}");
         }
         #endregion
 
@@ -646,7 +640,8 @@ namespace PAENN2.Models
             Analysis.InternalResults(X, Y, N1, N2, Elast, Inertia, Area, H1, H2, Q1, Q2, QIsGlobal, U, F, VarHolder.LoadcasesList,
                                      out Dictionary<string, List<double[]>> InUx, out Dictionary<string, List<double[]>> InUy,
                                      out Dictionary<string, List<double[]>> InRz, out Dictionary<string, List<double[]>> InN,
-                                     out Dictionary<string, List<double[]>> InQ, out Dictionary<string, List<double[]>> InM);
+                                     out Dictionary<string, List<double[]>> InQ, out Dictionary<string, List<double[]>> InM,
+                                     out Dictionary<string, List<int[]>> InMaxM, out Dictionary<string, List<int>> InMaxQ);
 
 
             foreach (string loadcase in VarHolder.LoadcasesList)
@@ -662,6 +657,8 @@ namespace PAENN2.Models
                     member.Axial[loadcase] = InN[loadcase][i];
                     member.Shear[loadcase] = InQ[loadcase][i];
                     member.Moment[loadcase] = InM[loadcase][i];
+                    member.MomentMax[loadcase] = InMaxM[loadcase][i];
+                    member.ShearMax[loadcase] = InMaxQ[loadcase][i];
                 }
             }
 
@@ -771,7 +768,6 @@ namespace PAENN2.Models
 
         public static void ResultShow(bool ChangeType = false)
         {
-            Trace.WriteLine("yay");
             foreach (Member member in VarHolder.MembersList)
             {
                 member.ShowResults();

@@ -138,6 +138,9 @@ namespace PAENN2.Models
         public Dictionary<string, double[]> Uy = new Dictionary<string, double[]>();
         public Dictionary<string, double[]> Rz = new Dictionary<string, double[]>();
 
+        public Dictionary<string, int> ShearMax = new Dictionary<string, int>();
+        public Dictionary<string, int[]> MomentMax = new Dictionary<string, int[]>();
+
         public double Length;
         public double Angle;
 

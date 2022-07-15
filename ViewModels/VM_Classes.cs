@@ -463,7 +463,7 @@ namespace PAENN2.ViewModels
         // Storage dicts for bitmap properties
         private Dictionary<string, int> lxp = new Dictionary<string, int> { { "H", 0 }, { "axis", 0 }, { "h0", 0 }, { "h1", 0 } };
         private Dictionary<string, int> lyp = new Dictionary<string, int> { { "H", 0 }, { "axis", 0 }, { "h0", 0 }, { "h1", 0 } };
-        private Dictionary<string, double> lres = new Dictionary<string, double> { { "axis", 0 }, { "h0", 0 }, { "h1", 0 }, { "h2", 0 }, { "ux0", 0 }, { "ux1", 0 } };
+        private Dictionary<string, double> lres = new Dictionary<string, double> { { "axis", 0 }, { "h0", 0 }, { "h1", 0 }, { "h2", 0 }, { "h3", 0 }, { "ux0", 0 }, { "ux1", 0 } };
         #endregion
 
 
@@ -488,6 +488,9 @@ namespace PAENN2.ViewModels
 
         private string text_r3 = "";
         public string Text_R3 { get => text_r3; set => ChangeProperty(ref text_r3, value); }
+
+        private string text_r4 = "";
+        public string Text_R4 { get => text_r4; set => ChangeProperty(ref text_r4, value); }
 
 
 
@@ -531,15 +534,19 @@ namespace PAENN2.ViewModels
             RenderTransform = new TransformGroup { Children = { new ScaleTransform(), new RotateTransform() } }
         };
 
-
-
         public TextBlock textblock_R3 = new TextBlock
         {
             Background = Brushes.White,
-            Foreground = Brushes.Red,
+            RenderTransform = new TransformGroup { Children = { new ScaleTransform(), new RotateTransform() } }
+        };
+
+        public TextBlock textblock_R4 = new TextBlock
+        {
+            Background = Brushes.White,
             RenderTransform = new TransformGroup { Children = { new ScaleTransform(), new RotateTransform() } }
         };
         #endregion
+
 
         public MemberInterface()
         {
@@ -547,10 +554,10 @@ namespace PAENN2.ViewModels
 
             VarHolder.Content.AddToCanvas(img, img_loadx, img_loady, img_hinge0, img_hinge1, resultpath, textblock_Qx0,
                                           textblock_Qx1, textblock_Qy0, textblock_Qy1,
-                                          textblock_R1, textblock_R2);
+                                          textblock_R1, textblock_R2, textblock_R3, textblock_R4);
 
-            this.MultipleBindings(new List<FrameworkElement> { textblock_Qx0, textblock_Qx1, textblock_Qy0, textblock_Qy1, textblock_R1, textblock_R2, textblock_R3 },
-                                  new List<string> { "Text_Qx0", "Text_Qx1", "Text_Qy0", "Text_Qy1", "Text_R1", "Text_R2", "Text_R3" }, TextBlock.TextProperty);
+            this.MultipleBindings(new List<FrameworkElement> { textblock_Qx0, textblock_Qx1, textblock_Qy0, textblock_Qy1, textblock_R1, textblock_R2, textblock_R3, textblock_R4 },
+                                  new List<string> { "Text_Qx0", "Text_Qx1", "Text_Qy0", "Text_Qy1", "Text_R1", "Text_R2", "Text_R3", "Text_R4" }, TextBlock.TextProperty);
 
 
             WriteableBitmap bmp = BitmapFactory.New(1, 6);
@@ -568,6 +575,7 @@ namespace PAENN2.ViewModels
             Parent = member;
             Reposition();
         }
+
 
         public void ToggleSelect(bool IsSelected)
         {
@@ -594,7 +602,6 @@ namespace PAENN2.ViewModels
                 bmp.FillEllipse(1, 1, 8, 8, Colors.White);
                 bmp.DrawEllipse(0, 0, 9, 9, hinge_color);
 
-
                 img_hinge0.Source = (Parent.Hinge_Start) ? bmp : null;
                 img_hinge1.Source = (Parent.Hinge_End) ? bmp : null;
             }
@@ -608,14 +615,15 @@ namespace PAENN2.ViewModels
 
             Helper.AddToCanvas(VarHolder.Content, img, img_loadx, img_loady, img_resline,
                                                        img_hinge0, img_hinge1, textblock_Qx0, textblock_Qx1,
-                                                       textblock_Qy0, textblock_Qy1, textblock_R1, textblock_R2, textblock_R3);
+                                                       textblock_Qy0, textblock_Qy1, textblock_R1, textblock_R2, textblock_R3, textblock_R4);
             Reposition();
         }
 
 
         public void RemoveFromCanvas() => Helper.RemoveFromCanvas(VarHolder.Content, img, img_loadx, img_loady, img_resline,
                                                                   img_hinge0, img_hinge1, textblock_Qx0, textblock_Qx1, textblock_Qy0,
-                                                                  textblock_Qy1, textblock_R1, textblock_R2, textblock_R3);
+                                                                  textblock_Qy1, textblock_R1, textblock_R2, textblock_R3, textblock_R4);
+
 
         public void MemberClick(object sender, System.Windows.Input.MouseButtonEventArgs e) => Parent.MemberClick(sender, e);
 
@@ -675,6 +683,8 @@ namespace PAENN2.ViewModels
 
                 double deriv0 = 0;
                 double deriv1 = 0;
+                int imax0 = -1;
+                int imax1 = -1;
 
 
 
@@ -686,11 +696,14 @@ namespace PAENN2.ViewModels
                     case "ResultsBM":
                         deriv0 = Parent.Shear[loadcase][0];
                         deriv1 = Parent.Shear[loadcase].Last();
+                        imax0 = Parent.MomentMax[loadcase][0];
+                        imax1 = Parent.MomentMax[loadcase][1];
                         break;
 
                     case "ResultsSF":
                         deriv0 = q0.Y;
                         deriv1 = q1.Y;
+                        imax0 = Parent.ShearMax[loadcase];
                         break;
 
                     case "ResultsNF":
@@ -706,9 +719,15 @@ namespace PAENN2.ViewModels
 
                 Size size_r1 = textblock_R1.MeasureString(Text_R1);
                 Size size_r2 = textblock_R2.MeasureString(Text_R2);
+                Size size_r3 = textblock_R3.MeasureString(Text_R3);
+                Size size_r4 = textblock_R4.MeasureString(Text_R4);
+
 
                 double yr1 = (lres["h0"] * k_angle > 0) ? size_r1.Height : 0;
                 double yr2 = (lres["h1"] * k_angle > 0) ? size_r2.Height : 0;
+                double yr3 = (lres["h2"] * k_angle > 0) ? size_r3.Height : 0;
+                double yr4 = (lres["h3"] * k_angle > 0) ? size_r4.Height : 0;
+
 
                 if (deriv0.CloseEnough(deriv1))
                 {
@@ -725,8 +744,8 @@ namespace PAENN2.ViewModels
                     else
                     {
                         Point pa = new Point(P1.X, P1.Y + (f * lres["h0"]) + (Math.Sign(lres["h0"]) * (5 + yr1)));
-                        Point pb = new Point(P1.X + L - size_r2.Width, P1.Y + (f * lres["h1"]) + (Math.Sign(lres["h1"]) * (5 + yr2)));
-
+                        Point pb = new Point(P1.X + L - size_r2.Width, P1.Y + (f * lres["h1"]) + Math.Sign(lres["h1"]) * (5 + yr2));
+                        
                         TransformGroup t1 = (TransformGroup)textblock_R1.RenderTransform;
                         TransformGroup t2 = (TransformGroup)textblock_R2.RenderTransform;
 
@@ -735,6 +754,26 @@ namespace PAENN2.ViewModels
 
                         Helper.SetCanvasPosition(textblock_R1, pa.X, pa.Y);
                         Helper.SetCanvasPosition(textblock_R2, pb.X, pb.Y);
+
+                        if (imax0 > 0)
+                        {
+                            double xmax = imax0 * L / (Parent.Moment[loadcase].Length - 1);
+                            Point pc = new Point(P1.X + xmax - size_r3.Width / 2, P1.Y + (f * lres["h2"]) + Math.Sign(lres["h2"]) * (5 + yr3));
+
+                            TransformGroup t3 = (TransformGroup)textblock_R3.RenderTransform;
+                            t3.AssignToChildren(k_angle, -k_angle, size_r3.Width / 2, 0, Parent.Angle, -pc.X + P1.X, -pc.Y + P1.Y);
+                            Helper.SetCanvasPosition(textblock_R3, pc.X, pc.Y);                         
+                        }
+
+                        if (imax1 > 0)
+                        {
+                            double xmax = imax1 * L / (Parent.Moment[loadcase].Length - 1);
+                            Point pd = new Point(P1.X + xmax - size_r4.Width / 2, P1.Y + (f * lres["h3"]) + Math.Sign(lres["h3"]) * (5 + yr4));
+
+                            TransformGroup t4 = (TransformGroup)textblock_R4.RenderTransform;
+                            t4.AssignToChildren(k_angle, -k_angle, size_r4.Width / 2, 0, Parent.Angle, -pd.X + P1.X, -pd.Y + P1.Y);
+                            Helper.SetCanvasPosition(textblock_R4, pd.X, pd.Y);
+                        }
                     }
                 }
 
@@ -751,6 +790,27 @@ namespace PAENN2.ViewModels
 
                     Helper.SetCanvasPosition(textblock_R1, pa.X, pa.Y);
                     Helper.SetCanvasPosition(textblock_R2, pb.X, pb.Y);
+
+
+                    if (imax0 > 0)
+                    {
+                        double xmax = imax0 * L / (Parent.Moment[loadcase].Length - 1);
+                        Point pc = new Point(P1.X + xmax - size_r3.Width / 2, P1.Y + (f * lres["h2"]) + Math.Sign(lres["h2"]) * (5 + yr3));
+
+                        TransformGroup t3 = (TransformGroup)textblock_R3.RenderTransform;
+                        t3.AssignToChildren(k_angle, -k_angle, size_r3.Width / 2, 0, Parent.Angle, -pc.X + P1.X, -pc.Y + P1.Y);
+                        Helper.SetCanvasPosition(textblock_R3, pc.X, pc.Y);
+                    }
+
+                    if (imax1 > 0)
+                    {
+                        double xmax = imax1 * L / (Parent.Moment[loadcase].Length - 1);
+                        Point pd = new Point(P1.X + xmax - size_r4.Width / 2, P1.Y + (f * lres["h3"]) + Math.Sign(lres["h3"]) * (5 + yr4));
+
+                        TransformGroup t4 = (TransformGroup)textblock_R4.RenderTransform;
+                        t4.AssignToChildren(k_angle, -k_angle, size_r4.Width / 2, 0, Parent.Angle, -pd.X + P1.X, -pd.Y + P1.Y);
+                        Helper.SetCanvasPosition(textblock_R4, pd.X, pd.Y);
+                    }
                 }
                 return;
             }
@@ -1309,6 +1369,8 @@ namespace PAENN2.ViewModels
             double[] defarray = new double[1];
             double T1 = 0;
             double T2 = 0;
+            double T3 = 0;
+            double T4 = 0;
             string format = "";
             Brush textcolor = Brushes.Magenta;
 
@@ -1318,31 +1380,45 @@ namespace PAENN2.ViewModels
                     DrawResults(Parent.Uy[loadcase], Parent.Ux[loadcase], Brushes.Magenta, false, VarHolder.ResultScale, VarHolder.ResultScale);
                     break;
                 case "ResultsBM":
-                    DrawResults(Parent.Moment[loadcase], defarray, Brushes.DarkGreen, true, -0.01 * VarHolder.ResultScale);
+                    int i1 = Parent.MomentMax[loadcase][0];
+                    int i2 = Parent.MomentMax[loadcase][1];
+                    DrawResults(Parent.Moment[loadcase], defarray, Brushes.DarkGreen, true, -0.01 * VarHolder.ResultScale, 1, i1, i2);
                     T1 = Math.Abs(Units.ConvertMoment(Parent.Moment[loadcase][0], Units.Moment, true));
                     T2 = Math.Abs(Units.ConvertMoment(Parent.Moment[loadcase].Last(), Units.Moment, true));
+                    T3 = i1 > 0 ? Math.Abs(Units.ConvertMoment(Parent.Moment[loadcase][i1], Units.Moment, true)) : 0;
+                    T4 = i2 > 0 ? Math.Abs(Units.ConvertMoment(Parent.Moment[loadcase][i1], Units.Moment, true)) : 0;
+                    
                     format = "Moment";
                     textcolor = Brushes.DarkGreen;
+                    Text_R3 = T3.CloseEnough(0) ? "" : T3.ToString(Units.Formats[format]);
+                    Text_R4 = T4.CloseEnough(0) ? "" : T4.ToString(Units.Formats[format]);
                     break;
                 case "ResultsSF":
-                    DrawResults(Parent.Shear[loadcase], defarray, Brushes.DarkRed, true, VarHolder.ResultScale);
+                    i1 = Parent.ShearMax[loadcase];
+                    DrawResults(Parent.Shear[loadcase], defarray, Brushes.DarkRed, true, VarHolder.ResultScale, Parent.ShearMax[loadcase]);
                     T1 = Units.ConvertForce(Parent.Shear[loadcase][0], Units.Force, true);
                     T2 = Units.ConvertForce(Parent.Shear[loadcase].Last(), Units.Force, true);
+                    T3 = i1 > 0 ? Units.ConvertForce(Parent.Shear[loadcase][i1], Units.Force, true) : 0;
+
                     format = "Force";
                     textcolor = Brushes.DarkRed;
+                    Text_R3 = T3.CloseEnough(0) ? "" : T3.ToString(Units.Formats[format]);
+                    Text_R4 = "";
                     break;
                 case "ResultsNF":
                     DrawResults(Parent.Axial[loadcase], defarray, Brushes.DarkBlue, true, VarHolder.ResultScale);
                     T1 = Units.ConvertForce(Parent.Axial[loadcase][0], Units.Force, true);
                     T2 = Units.ConvertForce(Parent.Axial[loadcase].Last(), Units.Force, true);
+
                     format = "Force";
                     textcolor = Brushes.DarkBlue;
+                    Text_R3 = Text_R4 = "";
                     break;
             }
 
             Text_R1 = T1.CloseEnough(0) ? "" : T1.ToString(Units.Formats[format]);
             Text_R2 = T2.CloseEnough(0) ? "" : T2.ToString(Units.Formats[format]);
-            textblock_R1.Foreground = textblock_R2.Foreground = textcolor;
+            textblock_R1.Foreground = textblock_R2.Foreground = textblock_R3.Foreground = textblock_R4.Foreground = textcolor;
 
 
             img_loadx.Source = img_loady.Source = null;
@@ -1353,7 +1429,7 @@ namespace PAENN2.ViewModels
         }
 
 
-        private void DrawResults(double[] YValues, double[] XValues, Brush ResultColor, bool ClosedAtEnds, double fy, double fx = 1)
+        private void DrawResults(double[] YValues, double[] XValues, Brush ResultColor, bool ClosedAtEnds, double fy, double fx = 1, int max1 = -1, int max2 = -1)
         {
             // Basic stuff
             double L = (Parent.N2.Coords - Parent.N1.Coords).Length;
@@ -1381,6 +1457,21 @@ namespace PAENN2.ViewModels
                     P.X = (L * i / (n - 1)) + (fx * XValues[i]);
                     P.Y = lres["axis"] + (fy * YValues[i]);
                     ctx.LineTo(P, true, false);
+
+                    if (i == max1 || i == max2)
+                    {
+                        P.X = (L * i / (n - 1));
+                        P.Y = lres["axis"] - 3;
+                        ctx.LineTo(P, true, false);
+                        P.X = (L * i / (n - 1)) + (fx * XValues[i]);
+                        P.Y = lres["axis"] + (fy * YValues[i]);
+                        ctx.LineTo(P, true, false);
+
+                        if (i == max1)
+                            lres["h2"] = fy * YValues[i];
+                        else
+                            lres["h3"] = fy * YValues[i];
+                    }
                 }
                 if (ClosedAtEnds)
                 {

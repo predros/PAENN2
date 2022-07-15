@@ -602,7 +602,8 @@ namespace PAENN2.Models
                                            Dictionary<string, List<double[]>> Forces, List<string> Loadcases,
                                            out Dictionary<string, List<double[]>> InUx, out Dictionary<string, List<double[]>> InUy,
                                            out Dictionary<string, List<double[]>> InRz, out Dictionary<string, List<double[]>> InN,
-                                           out Dictionary<string, List<double[]>> InQ, out Dictionary<string, List<double[]>> InM)
+                                           out Dictionary<string, List<double[]>> InQ, out Dictionary<string, List<double[]>> InM,
+                                           out Dictionary<string, List<int[]>> InMaxM, out Dictionary<string, List<int>> InMaxQ)
         {
             InUx = new Dictionary<string, List<double[]>>();
             InUy = new Dictionary<string, List<double[]>>();
@@ -611,6 +612,9 @@ namespace PAENN2.Models
             InN = new Dictionary<string, List<double[]>>();
             InQ = new Dictionary<string, List<double[]>>();
             InM = new Dictionary<string, List<double[]>>();
+
+            InMaxM = new Dictionary<string, List<int[]>>();
+            InMaxQ = new Dictionary<string, List<int>>();
 
             int nmembers = N1.Length;
 
@@ -623,6 +627,8 @@ namespace PAENN2.Models
                 InN[loadcase] = new List<double[]>();
                 InQ[loadcase] = new List<double[]>();
                 InM[loadcase] = new List<double[]>();
+                InMaxM[loadcase] = new List<int[]>();
+                InMaxQ[loadcase] = new List<int>();
             }
 
 
@@ -678,6 +684,43 @@ namespace PAENN2.Models
                     InRz[loadcase].Add(new double[npoints]);
                     InUy[loadcase].Add(new double[npoints]);
                     InUx[loadcase].Add(new double[npoints]);
+
+                    int imaxM0, imaxM1, imaxQ;
+
+                    if (qy0.CloseEnough(qy1))
+                    {
+                        double xmaxM = -F[1] / qy0;
+
+                        imaxM0 = (xmaxM < 0 || xmaxM > L) ? -1 : (int)(xmaxM / L * (npoints - 1));
+                        imaxM1 = imaxQ = -1;
+                    }
+                    else
+                    {
+                        double xmaxQ = qy0 * L / (qy0 - qy1);
+                        imaxQ = (xmaxQ < 0 || xmaxQ > L)? -1 : (int)(xmaxQ / L * (npoints - 1));
+
+                        double delta = L * L * qy0 * qy0 - (qy1 - qy0) * 2 * L * F[1];
+                        
+                        if (delta < 0)
+                        {
+                            imaxM0 = imaxM1 = -1;
+                        }
+                        else
+                        {
+                            double minusbOverTwoa = -L * qy0 / (qy1 - qy0);
+                            double sqrtDeltaOverTwoa = Math.Sqrt(delta) / 2 / (qy1 - qy0);
+                            
+                            double xmaxM0 = minusbOverTwoa + sqrtDeltaOverTwoa;
+                            double xmaxM1 = minusbOverTwoa - sqrtDeltaOverTwoa;
+
+                            imaxM0 = (xmaxM0 < 0 || xmaxM1 > L) ? -1 : (int)(xmaxM0 / L * (npoints - 1));
+                            imaxM1 = (xmaxM1 < 0 || xmaxM1 > L) ? -1 : (int)(xmaxM1 / L * (npoints - 1));
+                        }
+                    }
+
+
+                    InMaxM[loadcase].Add(new int[2] { imaxM0, imaxM1 });
+                    InMaxQ[loadcase].Add(imaxQ);
 
                     for (int i = 0; i < npoints; i++)
                     {
