@@ -61,9 +61,6 @@ namespace PAENN2
             }
 
             AnchorPoint_Window = e.GetPosition(this);
-            Trace.WriteLine(AnchorPoint_Window);
-            Trace.WriteLine(VarHolder.Transfmatrix.M11);
-
 
             if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
             {
